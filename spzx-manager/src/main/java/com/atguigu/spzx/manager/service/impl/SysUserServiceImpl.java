@@ -57,6 +57,7 @@ public class SysUserServiceImpl implements SysUserService {
 
         // 生成令牌，保存数据到Redis中
         String token = UUID.randomUUID().toString().replace("-", "");
+        // 对象转成JSON
         redisTemplate.opsForValue().set("user:login:" + token , JSON.toJSONString(sysUser) , 30 , TimeUnit.MINUTES);
 
         // 构建响应结果对象
@@ -68,5 +69,12 @@ public class SysUserServiceImpl implements SysUserService {
         return loginVo;
 
 
+    }
+
+    @Override
+    public SysUser getUserInfo(String token) {
+        String userJson = redisTemplate.opsForValue().get("user:login:" + token);
+        // JSON转成对象
+        return JSON.parseObject(userJson , SysUser.class) ;
     }
 }
